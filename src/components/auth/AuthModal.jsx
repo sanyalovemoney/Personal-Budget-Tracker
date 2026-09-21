@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
@@ -12,6 +12,16 @@ export const AuthModal = ({ isOpen, onClose }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const clearCredentials = () => {
+    setEmail('');
+    setPassword('');
+    setError('');
+  };
+
+  useEffect(() => {
+    if (!isOpen) clearCredentials();
+  }, [isOpen]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,6 +40,7 @@ export const AuthModal = ({ isOpen, onClose }) => {
       } else {
         await loginWithEmail(email, password);
       }
+      clearCredentials();
       onClose();
     } catch (err) {
       console.error(err);
@@ -108,6 +119,9 @@ export const AuthModal = ({ isOpen, onClose }) => {
             </label>
             <input
               type="email"
+              id="auth-email"
+              name="email"
+              autoComplete="email"
               placeholder="user@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -122,6 +136,9 @@ export const AuthModal = ({ isOpen, onClose }) => {
             </label>
             <input
               type="password"
+              id="auth-password"
+              name="password"
+              autoComplete={isSignUp ? 'new-password' : 'current-password'}
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

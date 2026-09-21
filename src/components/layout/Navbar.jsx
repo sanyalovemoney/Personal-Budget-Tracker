@@ -95,11 +95,20 @@ export const Navbar = ({ onOpenAuthModal }) => {
           {/* Auth Status */}
           {currentUser && !isDemoMode ? (
             <div className="flex items-center gap-2">
-              <img 
-                src={currentUser.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser.email}`} 
-                alt="User Avatar" 
-                className="w-8 h-8 rounded-full border border-emerald-500/50"
-              />
+              {currentUser.photoURL ? (
+                <img 
+                  src={currentUser.photoURL} 
+                  alt="User Avatar" 
+                  className="w-8 h-8 rounded-full border border-emerald-500/50"
+                />
+              ) : (
+                <div 
+                  aria-label="User Avatar"
+                  className="w-8 h-8 rounded-full border border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs font-bold uppercase"
+                >
+                  {(currentUser.displayName || currentUser.email || '?').charAt(0)}
+                </div>
+              )}
               <Button variant="ghost" size="sm" onClick={logout} icon={LogOut}>
                 <span className="hidden md:inline">Вихід</span>
               </Button>

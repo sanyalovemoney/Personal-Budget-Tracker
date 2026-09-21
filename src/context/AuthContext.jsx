@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
             uid: 'demo-user-123',
             displayName: 'Демо Користувач',
             email: 'demo@budget.app',
-            photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=BudgetApp'
+            photoURL: null
           };
           setCurrentUser(guestUser);
           setIsDemoMode(true);
@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
         uid: 'demo-user-123',
         displayName: 'Демо Користувач',
         email: 'demo@budget.app',
-        photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=BudgetApp'
+        photoURL: null
       };
       setCurrentUser(guestUser);
       setIsDemoMode(true);
@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }) => {
       uid: 'demo-user-123',
       displayName: 'Демо Користувач',
       email: 'demo@budget.app',
-      photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=BudgetApp'
+      photoURL: null
     };
     setCurrentUser(guestUser);
     setIsDemoMode(true);

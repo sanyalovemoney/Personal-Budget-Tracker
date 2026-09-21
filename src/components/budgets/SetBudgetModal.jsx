@@ -7,14 +7,13 @@ import { Modal } from '../ui/Modal';
 import { Save, Target } from 'lucide-react';
 
 export const SetBudgetModal = ({ isOpen, onClose, targetCategory = null }) => {
-  const { budgets, setCategoryBudget, currency, toDisplayAmount, toStoredAmount } = useBudget();
+  const { effectiveBudgets, setCategoryBudget, currency, toDisplayAmount, toStoredAmount } = useBudget();
   const [categoryId, setCategoryId] = useState('food');
   const [limit, setLimit] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
   const limitForCategory = (id) => {
-    const cat = DEFAULT_CATEGORIES.find(c => c.id === id);
-    const stored = budgets[id] ?? cat?.defaultBudget ?? 100;
+    const stored = effectiveBudgets[id] ?? 0;
     return toDisplayAmount(stored);
   };
 
@@ -22,7 +21,7 @@ export const SetBudgetModal = ({ isOpen, onClose, targetCategory = null }) => {
     const id = targetCategory ? targetCategory.id : 'food';
     setCategoryId(id);
     setLimit(limitForCategory(id));
-  }, [targetCategory, isOpen, budgets, currency]);
+  }, [targetCategory, isOpen, effectiveBudgets, currency]);
 
   const handleCategoryChange = (e) => {
     const id = e.target.value;
