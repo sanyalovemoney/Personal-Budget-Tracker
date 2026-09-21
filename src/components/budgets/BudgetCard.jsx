@@ -1,0 +1,115 @@
+import React from 'react';
+import { useBudget } from '../../context/BudgetContext';
+import { DEFAULT_CATEGORIES } from '../../utils/constants';
+import { formatCurrency } from '../../utils/formatters';
+import { Card } from '../ui/Card';
+import { Button } from '../ui/Button';
+import { Target, AlertTriangle, CheckCircle, Edit3 } from 'lucide-react';
+import * as Icons from 'lucide-react';
+
+export const BudgetCard = ({ onOpenSetBudgetModal }) => {
+  const { monthlyTransactions, budgets, currency } = useBudget();
+
+  // Aggregate spent per category
+  const categorySpent = {};
+  monthlyTransactions.forEach(t => {
+    if (t.type === 'expense' || !t.type) {
+      categorySpent[t.categoryId] = (categorySpent[t.categoryId] || 0) + Number(t.amount || 0);
+    }
+  });
+
+  return (
+    <Card 
+      title="Контроль бюджету по категоріях" 
+      action={
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => onOpenSetBudgetModal()}
+          icon={Target}
+        >
+          Налаштувати ліміти
+        </Button>
+      }
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {DEFAULT_CATEGORIES.map(cat => {
+          const limit = Number(budgets[cat.id] || cat.defaultBudget || 0);
+          const spent = categorySpent[cat.id] || 0;
+          const percent = limit > 0 ? Math.min(Math.round((spent / limit) * 100), 100) : 0;
+          const rawPercent = limit > 0 ? (spent / limit) * 100 : 0;
+          const isOver = rawPercent >= 100;
+          const isWarning = rawPercent >= 80 && !isOver;
+
+          const IconComponent = Icons[cat.icon] || Target;
+
+          return (
+            <div 
+              key={cat.id} 
+              className="p-4 bg-white/60 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60 rounded-2xl hover:border-slate-300 dark:hover:border-slate-700 transition-all group"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2.5">
+                  <div className={`p-2 rounded-xl border ${cat.bg}`}>
+                    <IconComponent className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">{cat.name}</h4>
+                    <p className="text-[11px] text-slate-400">
+                      {formatCurrency(spent, currency)} з {formatCurrency(limit, currency)}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-extrabold ${
+                    isOver 
+                      ? 'text-rose-500' 
+                      : isWarning 
+                      ? 'text-amber-500' 
+                      : 'text-slate-600 dark:text-slate-300'
+                  }`}>
+                    {Math.round(rawPercent)}%
+                  </span>
+                  <button
+                    onClick={() => onOpenSetBudgetModal(cat)}
+                    className="p-1 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-emerald-500 transition-opacity"
+                    title="Змінити ліміт"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="w-full h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-1.5">
+                <div 
+                  className={`h-full transition-all duration-500 rounded-full ${
+                    isOver 
+                      ? 'bg-rose-500 shadow-sm shadow-rose-500/50' 
+                      : isWarning 
+                      ? 'bg-amber-500 shadow-sm shadow-amber-500/50' 
+                      : 'bg-emerald-500 shadow-sm shadow-emerald-500/50'
+                  }`}
+                  style={{ width: `${percent}%` }}
+                ></div>
+              </div>
+
+              {/* Alert status footnote */}
+              {isOver ? (
+                <div className="flex items-center gap-1 text-[10px] font-semibold text-rose-500 mt-1">
+                  <AlertTriangle className="w-3 h-3" /> Перевищено на {formatCurrency(spent - limit, currency)}!
+                </div>
+              ) : isWarning ? (
+                <div className="flex items-center gap-1 text-[10px] font-semibold text-amber-500 mt-1">
+                  <AlertTriangle className="w-3 h-3" /> Наближається до ліміту (80%+)
+                </div>
+              ) : null}
+
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+};
