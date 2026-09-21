@@ -2,6 +2,8 @@
 
 A web app for tracking personal finances: income and expenses by category, monthly budget limits, analytics and spend forecasting, CSV export. It runs either fully locally (LocalStorage, no sign-up) or with cloud sync through Firebase.
 
+Live demo: https://personal-budget-tracker-87c24.web.app
+
 The user interface is in Ukrainian.
 
 ## Features
@@ -79,6 +81,17 @@ service cloud.firestore {
   }
 }
 ```
+
+## Deployment
+
+The app is a static bundle, hosted on Firebase Hosting. Firebase environment variables are read at build time, so they must be present before `npm run build`.
+
+```bash
+npm run build
+firebase deploy --only hosting
+```
+
+First-time setup: `npm install -g firebase-tools`, `firebase login`, then `firebase init hosting` with `dist` as the public directory and "single-page app" enabled so client-side routing and reloads work.
 
 ## Currencies
 
