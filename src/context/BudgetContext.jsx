@@ -205,7 +205,14 @@ export const BudgetProvider = ({ children }) => {
     .filter(t => t.type === 'income')
     .reduce((acc, t) => acc + Number(t.amount || 0), 0);
 
-  const totalBudgetLimit = Object.values(budgets).reduce((acc, b) => acc + Number(b || 0), 0);
+  // A category without a saved budget falls back to its default, so totals and
+  // cards always describe the same limits.
+  const effectiveBudgets = DEFAULT_CATEGORIES.reduce((acc, cat) => {
+    acc[cat.id] = Number(budgets[cat.id] ?? cat.defaultBudget ?? 0);
+    return acc;
+  }, {});
+
+  const totalBudgetLimit = Object.values(effectiveBudgets).reduce((acc, b) => acc + Number(b || 0), 0);
 
   const value = {
     selectedMonth,
@@ -217,6 +224,7 @@ export const BudgetProvider = ({ children }) => {
     transactions,
     monthlyTransactions,
     budgets,
+    effectiveBudgets,
     loadingData,
     addTransaction,
     updateTransaction,

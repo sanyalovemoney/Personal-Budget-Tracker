@@ -7,7 +7,7 @@ import { Target, AlertTriangle, CheckCircle, Edit3 } from 'lucide-react';
 import * as Icons from 'lucide-react';
 
 export const BudgetCard = ({ onOpenSetBudgetModal }) => {
-  const { monthlyTransactions, budgets, formatAmount } = useBudget();
+  const { monthlyTransactions, effectiveBudgets, formatAmount } = useBudget();
 
   // Aggregate spent per category
   const categorySpent = {};
@@ -33,7 +33,7 @@ export const BudgetCard = ({ onOpenSetBudgetModal }) => {
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {DEFAULT_CATEGORIES.map(cat => {
-          const limit = Number(budgets[cat.id] ?? cat.defaultBudget ?? 0);
+          const limit = Number(effectiveBudgets[cat.id] ?? 0);
           const spent = categorySpent[cat.id] || 0;
           // Compare in minor units so rounding never turns an exact hit into an overrun
           const spentMinor = Math.round(spent * 100);
