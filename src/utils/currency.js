@@ -14,18 +14,23 @@ export const MAX_AMOUNT = 1_000_000_000;
 
 export const getRate = (currency) => EXCHANGE_RATES[currency] ?? 1;
 
-const roundMinor = (value) => Math.round(value * 100) / 100;
+// Display values are rounded to minor units; stored base values keep extra
+// precision so a converted amount round-trips back to what was typed.
+const round = (value, digits) => {
+  const factor = 10 ** digits;
+  return Math.round(value * factor) / factor;
+};
 
 export const fromBase = (amount, currency) => {
   const numeric = Number(amount);
   if (!Number.isFinite(numeric)) return 0;
-  return roundMinor(numeric * getRate(currency));
+  return round(numeric * getRate(currency), 2);
 };
 
 export const toBase = (amount, currency) => {
   const numeric = Number(amount);
   if (!Number.isFinite(numeric)) return 0;
-  return roundMinor(numeric / getRate(currency));
+  return round(numeric / getRate(currency), 8);
 };
 
 export const isValidAmount = (value, { allowZero = false } = {}) => {
