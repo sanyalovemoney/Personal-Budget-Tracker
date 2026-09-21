@@ -8,7 +8,7 @@ import { DEFAULT_CATEGORIES } from '../../utils/constants';
 import { Search, Download, Plus, Filter, Receipt } from 'lucide-react';
 
 export const ExpenseList = ({ onOpenAddModal, onEditTransaction }) => {
-  const { monthlyTransactions, selectedMonth } = useBudget();
+  const { monthlyTransactions, selectedMonth, currency } = useBudget();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('all'); // 'all' | 'expense' | 'income'
   const [filterCategory, setFilterCategory] = useState('all');
@@ -40,7 +40,7 @@ export const ExpenseList = ({ onOpenAddModal, onEditTransaction }) => {
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={() => exportTransactionsToCSV(filtered, selectedMonth)}
+            onClick={() => exportTransactionsToCSV(filtered, selectedMonth, currency)}
             icon={Download}
           >
             <span className="hidden sm:inline">CSV Експорт</span>

@@ -1,6 +1,5 @@
 import React from 'react';
 import { useBudget } from '../../context/BudgetContext';
-import { formatCurrency } from '../../utils/formatters';
 import { Card } from '../ui/Card';
 import { Alert } from '../ui/Alert';
 import { 
@@ -19,7 +18,7 @@ export const SpendingInsights = () => {
     totalSpent, 
     totalIncome, 
     totalBudgetLimit, 
-    currency, 
+    formatAmount, 
     selectedMonth,
     monthlyTransactions 
   } = useBudget();
@@ -60,8 +59,8 @@ export const SpendingInsights = () => {
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">
-            {formatCurrency(totalIncome, currency)}
+          <div className="text-2xl font-extrabold break-words text-emerald-600 dark:text-emerald-400">
+            {formatAmount(totalIncome)}
           </div>
           <p className="text-[11px] text-slate-400 mt-1">Отримані надходження</p>
         </div>
@@ -74,8 +73,8 @@ export const SpendingInsights = () => {
               <TrendingDown className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-2xl font-extrabold text-slate-900 dark:text-white">
-            {formatCurrency(totalSpent, currency)}
+          <div className="text-2xl font-extrabold break-words text-slate-900 dark:text-white">
+            {formatAmount(totalSpent)}
           </div>
           <p className="text-[11px] text-slate-400 mt-1">
             {totalBudgetLimit > 0 ? `${Math.round((totalSpent / totalBudgetLimit) * 100)}% від загального бюджету` : 'Загальні витрати'}
@@ -90,8 +89,8 @@ export const SpendingInsights = () => {
               <Wallet className="w-4 h-4" />
             </div>
           </div>
-          <div className={`text-2xl font-extrabold ${netBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-rose-500'}`}>
-            {formatCurrency(netBalance, currency)}
+          <div className={`text-2xl font-extrabold break-words ${netBalance >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-rose-500'}`}>
+            {formatAmount(netBalance)}
           </div>
           <p className="text-[11px] text-slate-400 mt-1">Доходи мінус витрати</p>
         </div>
@@ -104,10 +103,10 @@ export const SpendingInsights = () => {
               <Zap className="w-4 h-4" />
             </div>
           </div>
-          <div className={`text-2xl font-extrabold ${budgetRemaining >= 0 ? 'text-purple-600 dark:text-purple-400' : 'text-rose-500'}`}>
-            {formatCurrency(budgetRemaining, currency)}
+          <div className={`text-2xl font-extrabold break-words ${budgetRemaining >= 0 ? 'text-purple-600 dark:text-purple-400' : 'text-rose-500'}`}>
+            {formatAmount(budgetRemaining)}
           </div>
-          <p className="text-[11px] text-slate-400 mt-1">З загального ліміту {formatCurrency(totalBudgetLimit, currency)}</p>
+          <p className="text-[11px] text-slate-400 mt-1">З загального ліміту {formatAmount(totalBudgetLimit)}</p>
         </div>
 
       </div>
@@ -119,8 +118,8 @@ export const SpendingInsights = () => {
           {/* Daily Pace */}
           <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200/60 dark:border-slate-800">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block mb-1">Середньодобові витрати</span>
-            <div className="text-xl font-bold text-slate-800 dark:text-slate-100">
-              {formatCurrency(avgDailySpend, currency)} <span className="text-xs font-normal text-slate-400">/день</span>
+            <div className="text-xl font-bold break-words text-slate-800 dark:text-slate-100">
+              {formatAmount(avgDailySpend)} <span className="text-xs font-normal text-slate-400">/день</span>
             </div>
             <p className="text-[11px] text-slate-400 mt-1">Розраховано за останні {currentDay} дн.</p>
           </div>
@@ -129,7 +128,7 @@ export const SpendingInsights = () => {
           <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-200/60 dark:border-slate-800">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block mb-1">Прогноз на кінець місяця</span>
             <div className={`text-xl font-bold ${isProjectedOver ? 'text-rose-500' : 'text-emerald-500'}`}>
-              {formatCurrency(projectedMonthEndSpend, currency)}
+              {formatAmount(projectedMonthEndSpend)}
             </div>
             <p className="text-[11px] text-slate-400 mt-1">Очікувана сума за {daysInMonth} дн.</p>
           </div>
@@ -145,7 +144,7 @@ export const SpendingInsights = () => {
               </h5>
               <p className="text-[11px] text-slate-500 dark:text-slate-400">
                 {isProjectedOver 
-                  ? `Поточний темп загрожує перевищенням на ${formatCurrency(projectedMonthEndSpend - totalBudgetLimit, currency)}.`
+                  ? `Поточний темп загрожує перевищенням на ${formatAmount(projectedMonthEndSpend - totalBudgetLimit)}.`
                   : 'За поточного темпу ви вкладаєтеся у запланований бюджет.'}
               </p>
             </div>

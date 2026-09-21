@@ -1,14 +1,13 @@
 import React from 'react';
 import { useBudget } from '../../context/BudgetContext';
 import { DEFAULT_CATEGORIES } from '../../utils/constants';
-import { formatCurrency } from '../../utils/formatters';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Target, AlertTriangle, CheckCircle, Edit3 } from 'lucide-react';
 import * as Icons from 'lucide-react';
 
 export const BudgetCard = ({ onOpenSetBudgetModal }) => {
-  const { monthlyTransactions, budgets, currency } = useBudget();
+  const { monthlyTransactions, budgets, formatAmount } = useBudget();
 
   // Aggregate spent per category
   const categorySpent = {};
@@ -34,12 +33,16 @@ export const BudgetCard = ({ onOpenSetBudgetModal }) => {
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {DEFAULT_CATEGORIES.map(cat => {
-          const limit = Number(budgets[cat.id] || cat.defaultBudget || 0);
+          const limit = Number(budgets[cat.id] ?? cat.defaultBudget ?? 0);
           const spent = categorySpent[cat.id] || 0;
-          const percent = limit > 0 ? Math.min(Math.round((spent / limit) * 100), 100) : 0;
-          const rawPercent = limit > 0 ? (spent / limit) * 100 : 0;
-          const isOver = rawPercent >= 100;
-          const isWarning = rawPercent >= 80 && !isOver;
+          // Compare in minor units so rounding never turns an exact hit into an overrun
+          const spentMinor = Math.round(spent * 100);
+          const limitMinor = Math.round(limit * 100);
+          const rawPercent = limitMinor > 0 ? (spentMinor / limitMinor) * 100 : 0;
+          const isOver = spentMinor > limitMinor;
+          const isReached = spentMinor === limitMinor && limitMinor > 0;
+          const isWarning = !isOver && !isReached && rawPercent >= 80;
+          const percent = isOver || isReached ? 100 : Math.min(Math.round(rawPercent), 100);
 
           const IconComponent = Icons[cat.icon] || Target;
 
@@ -48,20 +51,20 @@ export const BudgetCard = ({ onOpenSetBudgetModal }) => {
               key={cat.id} 
               className="p-4 bg-white/60 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60 rounded-2xl hover:border-slate-300 dark:hover:border-slate-700 transition-all group"
             >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2.5">
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <div className={`p-2 rounded-xl border ${cat.bg}`}>
                     <IconComponent className="w-4 h-4" />
                   </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100">{cat.name}</h4>
-                    <p className="text-[11px] text-slate-400">
-                      {formatCurrency(spent, currency)} з {formatCurrency(limit, currency)}
+                  <div className="min-w-0">
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100 break-words">{cat.name}</h4>
+                    <p className="text-[11px] text-slate-400 break-words">
+                      {formatAmount(spent)} з {formatAmount(limit)}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   <span className={`text-xs font-extrabold ${
                     isOver 
                       ? 'text-rose-500' 
@@ -69,7 +72,7 @@ export const BudgetCard = ({ onOpenSetBudgetModal }) => {
                       ? 'text-amber-500' 
                       : 'text-slate-600 dark:text-slate-300'
                   }`}>
-                    {Math.round(rawPercent)}%
+                    {limitMinor > 0 ? `${Math.round(rawPercent)}%` : '—'}
                   </span>
                   <button
                     onClick={() => onOpenSetBudgetModal(cat)}
@@ -98,7 +101,11 @@ export const BudgetCard = ({ onOpenSetBudgetModal }) => {
               {/* Alert status footnote */}
               {isOver ? (
                 <div className="flex items-center gap-1 text-[10px] font-semibold text-rose-500 mt-1">
-                  <AlertTriangle className="w-3 h-3" /> Перевищено на {formatCurrency(spent - limit, currency)}!
+                  <AlertTriangle className="w-3 h-3" /> Перевищено на {formatAmount(spent - limit)}!
+                </div>
+              ) : isReached ? (
+                <div className="flex items-center gap-1 text-[10px] font-semibold text-amber-500 mt-1">
+                  <CheckCircle className="w-3 h-3" /> Ліміт досягнуто
                 </div>
               ) : isWarning ? (
                 <div className="flex items-center gap-1 text-[10px] font-semibold text-amber-500 mt-1">

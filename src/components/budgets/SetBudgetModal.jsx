@@ -1,43 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { useBudget } from '../../context/BudgetContext';
 import { DEFAULT_CATEGORIES } from '../../utils/constants';
+import { MAX_AMOUNT, isValidAmount } from '../../utils/currency';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
 import { Save, Target } from 'lucide-react';
 
 export const SetBudgetModal = ({ isOpen, onClose, targetCategory = null }) => {
-  const { budgets, setCategoryBudget, currency } = useBudget();
+  const { budgets, setCategoryBudget, currency, toDisplayAmount, toStoredAmount } = useBudget();
   const [categoryId, setCategoryId] = useState('food');
   const [limit, setLimit] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
+  const limitForCategory = (id) => {
+    const cat = DEFAULT_CATEGORIES.find(c => c.id === id);
+    const stored = budgets[id] ?? cat?.defaultBudget ?? 100;
+    return toDisplayAmount(stored);
+  };
+
   useEffect(() => {
-    if (targetCategory) {
-      setCategoryId(targetCategory.id);
-      setLimit(budgets[targetCategory.id] || targetCategory.defaultBudget || 100);
-    } else {
-      setCategoryId('food');
-      setLimit(budgets['food'] || 400);
-    }
-  }, [targetCategory, isOpen, budgets]);
+    const id = targetCategory ? targetCategory.id : 'food';
+    setCategoryId(id);
+    setLimit(limitForCategory(id));
+  }, [targetCategory, isOpen, budgets, currency]);
 
   const handleCategoryChange = (e) => {
     const id = e.target.value;
     setCategoryId(id);
-    const cat = DEFAULT_CATEGORIES.find(c => c.id === id);
-    setLimit(budgets[id] || (cat ? cat.defaultBudget : 100));
+    setLimit(limitForCategory(id));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!limit || Number(limit) < 0) {
-      alert('Будь ласка, введіть коректну суму бюджету');
+    if (!isValidAmount(limit, { allowZero: true })) {
+      alert(`Будь ласка, введіть суму від 0 до ${MAX_AMOUNT.toLocaleString('uk-UA')}`);
       return;
     }
 
     setIsSaving(true);
     try {
-      await setCategoryBudget(categoryId, limit);
+      await setCategoryBudget(categoryId, toStoredAmount(limit));
       onClose();
     } catch (err) {
       console.error('Error updating budget:', err);
@@ -77,6 +79,8 @@ export const SetBudgetModal = ({ isOpen, onClose, targetCategory = null }) => {
             <input
               type="number"
               step="10"
+              min="0"
+              max={MAX_AMOUNT}
               placeholder="0"
               value={limit}
               onChange={(e) => setLimit(e.target.value)}

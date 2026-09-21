@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useBudget } from '../../context/BudgetContext';
 import { DEFAULT_CATEGORIES } from '../../utils/constants';
+import { MAX_AMOUNT, isValidAmount } from '../../utils/currency';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
 import { PlusCircle, Save, DollarSign, Calendar, FileText, Tag, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import * as Icons from 'lucide-react';
 
 export const ExpenseForm = ({ isOpen, onClose, initialData = null }) => {
-  const { addTransaction, updateTransaction, currency } = useBudget();
+  const { addTransaction, updateTransaction, currency, toDisplayAmount, toStoredAmount } = useBudget();
 
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('expense'); // 'expense' | 'income'
@@ -18,7 +19,7 @@ export const ExpenseForm = ({ isOpen, onClose, initialData = null }) => {
 
   useEffect(() => {
     if (initialData) {
-      setAmount(initialData.amount || '');
+      setAmount(initialData.amount != null ? toDisplayAmount(initialData.amount) : '');
       setType(initialData.type || 'expense');
       setCategoryId(initialData.categoryId || 'food');
       setDate(initialData.date ? initialData.date.substring(0, 10) : new Date().toISOString().substring(0, 10));
@@ -30,19 +31,19 @@ export const ExpenseForm = ({ isOpen, onClose, initialData = null }) => {
       setDate(new Date().toISOString().substring(0, 10));
       setNote('');
     }
-  }, [initialData, isOpen]);
+  }, [initialData, isOpen, currency]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!amount || Number(amount) <= 0) {
-      alert('Будь ласка, введіть суму більше 0');
+    if (!isValidAmount(amount)) {
+      alert(`Будь ласка, введіть суму від 0.01 до ${MAX_AMOUNT.toLocaleString('uk-UA')}`);
       return;
     }
 
     setIsSubmitting(true);
     try {
       const payload = {
-        amount: parseFloat(amount),
+        amount: toStoredAmount(amount),
         type,
         categoryId,
         date: new Date(date).toISOString(),
@@ -108,6 +109,8 @@ export const ExpenseForm = ({ isOpen, onClose, initialData = null }) => {
             <input
               type="number"
               step="0.01"
+              min="0.01"
+              max={MAX_AMOUNT}
               placeholder="0.00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
@@ -171,6 +174,7 @@ export const ExpenseForm = ({ isOpen, onClose, initialData = null }) => {
             <input
               type="text"
               placeholder="Наприклад: Продукти в Сільпо"
+              maxLength={200}
               value={note}
               onChange={(e) => setNote(e.target.value)}
               className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900 dark:text-white"
