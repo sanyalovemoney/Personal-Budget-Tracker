@@ -31,7 +31,7 @@ export const Navbar = ({ onOpenAuthModal }) => {
 
   return (
     <header className="sticky top-0 z-40 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:h-20 flex flex-wrap lg:flex-nowrap items-center justify-between gap-3">
         
         {/* Logo & Brand */}
         <div className="flex items-center gap-3">
@@ -56,7 +56,7 @@ export const Navbar = ({ onOpenAuthModal }) => {
         </div>
 
         {/* Center: Month Selector */}
-        <div className="flex items-center gap-2 bg-slate-100/80 dark:bg-slate-900/80 p-1.5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60">
+        <div className="order-last lg:order-none w-full lg:w-auto flex items-center gap-2 bg-slate-100/80 dark:bg-slate-900/80 p-1.5 rounded-2xl border border-slate-200/60 dark:border-slate-800/60">
           <Calendar className="w-4 h-4 text-emerald-500 ml-2.5 hidden sm:inline-block" />
           <input 
             type="month" 
@@ -70,7 +70,7 @@ export const Navbar = ({ onOpenAuthModal }) => {
         </div>
 
         {/* Right Controls */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           
           {/* Currency Select */}
           <select

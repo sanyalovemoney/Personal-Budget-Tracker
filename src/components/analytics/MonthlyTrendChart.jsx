@@ -17,7 +17,7 @@ import { TrendingUp } from 'lucide-react';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export const MonthlyTrendChart = () => {
-  const { monthlyTransactions, selectedMonth, currency, darkMode } = useBudget();
+  const { monthlyTransactions, selectedMonth, currency, darkMode, toDisplayAmount } = useBudget();
 
   // Extract year and month
   const [yearStr, monthStr] = selectedMonth.split('-');
@@ -37,10 +37,11 @@ export const MonthlyTrendChart = () => {
       const d = new Date(t.date);
       const dayNum = d.getDate();
       if (dayNum >= 1 && dayNum <= daysInMonth) {
+        const amount = toDisplayAmount(t.amount || 0);
         if (t.type === 'income') {
-          dailyIncome[dayNum - 1] += Number(t.amount || 0);
+          dailyIncome[dayNum - 1] += amount;
         } else {
-          dailyExpenses[dayNum - 1] += Number(t.amount || 0);
+          dailyExpenses[dayNum - 1] += amount;
         }
       }
     }

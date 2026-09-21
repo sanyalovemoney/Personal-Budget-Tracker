@@ -15,13 +15,13 @@ import { PieChart } from 'lucide-react';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export const CategoryBreakdownChart = () => {
-  const { monthlyTransactions, currency, darkMode } = useBudget();
+  const { monthlyTransactions, currency, darkMode, toDisplayAmount } = useBudget();
 
   // Aggregate expenses by category
   const categoryTotals = {};
   monthlyTransactions.forEach(t => {
     if (t.type === 'expense' || !t.type) {
-      categoryTotals[t.categoryId] = (categoryTotals[t.categoryId] || 0) + Number(t.amount || 0);
+      categoryTotals[t.categoryId] = (categoryTotals[t.categoryId] || 0) + toDisplayAmount(t.amount || 0);
     }
   });
 

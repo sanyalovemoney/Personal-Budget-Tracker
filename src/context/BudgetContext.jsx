@@ -13,6 +13,8 @@ import {
   orderBy 
 } from 'firebase/firestore';
 import { DEFAULT_CATEGORIES, INITIAL_DEMO_TRANSACTIONS } from '../utils/constants';
+import { fromBase, toBase } from '../utils/currency';
+import { formatCurrency } from '../utils/formatters';
 import { format } from 'date-fns';
 
 const BudgetContext = createContext();
@@ -184,6 +186,11 @@ export const BudgetProvider = ({ children }) => {
 
   const toggleDarkMode = () => setDarkMode(prev => !prev);
 
+  // Stored amounts are in the base currency; convert only at the display/input boundary
+  const toDisplayAmount = (baseAmount) => fromBase(baseAmount, currency);
+  const toStoredAmount = (displayAmount) => toBase(displayAmount, currency);
+  const formatAmount = (baseAmount) => formatCurrency(fromBase(baseAmount, currency), currency);
+
   // Compute stats for the currently selected month
   const monthlyTransactions = transactions.filter(t => {
     if (!t.date) return false;
@@ -215,6 +222,9 @@ export const BudgetProvider = ({ children }) => {
     updateTransaction,
     deleteTransaction,
     setCategoryBudget,
+    toDisplayAmount,
+    toStoredAmount,
+    formatAmount,
     totalSpent,
     totalIncome,
     totalBudgetLimit
