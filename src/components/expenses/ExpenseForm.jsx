@@ -108,9 +108,8 @@ export const ExpenseForm = ({ isOpen, onClose, initialData = null }) => {
           <div className="relative">
             <input
               type="number"
-              step="0.01"
-              min="0.01"
-              max={MAX_AMOUNT}
+              step="any"
+              inputMode="decimal"
               placeholder="0.00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}

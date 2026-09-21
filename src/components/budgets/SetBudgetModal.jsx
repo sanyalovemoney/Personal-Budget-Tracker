@@ -77,9 +77,8 @@ export const SetBudgetModal = ({ isOpen, onClose, targetCategory = null }) => {
           <div className="relative">
             <input
               type="number"
-              step="10"
-              min="0"
-              max={MAX_AMOUNT}
+              step="any"
+              inputMode="decimal"
               placeholder="0"
               value={limit}
               onChange={(e) => setLimit(e.target.value)}
