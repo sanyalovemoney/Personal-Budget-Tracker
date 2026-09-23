@@ -73,6 +73,82 @@ export const DEFAULT_CATEGORIES = [
   }
 ];
 
+export const INCOME_CATEGORIES = [
+  {
+    id: 'salary',
+    name: 'Зарплата',
+    icon: 'Wallet',
+    color: 'emerald',
+    bg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+    hex: '#10b981'
+  },
+  {
+    id: 'bonus',
+    name: 'Премії та Бонуси',
+    icon: 'Gift',
+    color: 'amber',
+    bg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+    hex: '#f59e0b'
+  },
+  {
+    id: 'freelance',
+    name: 'Підробіток / Фріланс',
+    icon: 'Laptop',
+    color: 'blue',
+    bg: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+    hex: '#3b82f6'
+  },
+  {
+    id: 'investments',
+    name: 'Інвестиції та Відсотки',
+    icon: 'TrendingUp',
+    color: 'indigo',
+    bg: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+    hex: '#6366f1'
+  },
+  {
+    id: 'gifts',
+    name: 'Подарунки та Допомога',
+    icon: 'HandCoins',
+    color: 'pink',
+    bg: 'bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/20',
+    hex: '#ec4899'
+  },
+  {
+    id: 'sales',
+    name: 'Продаж речей',
+    icon: 'Tag',
+    color: 'purple',
+    bg: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+    hex: '#8b5cf6'
+  },
+  {
+    id: 'refunds',
+    name: 'Повернення коштів',
+    icon: 'Undo2',
+    color: 'teal',
+    bg: 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+    hex: '#14b8a6'
+  },
+  {
+    id: 'other-income',
+    name: 'Інші надходження',
+    icon: 'MoreHorizontal',
+    color: 'slate',
+    bg: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20',
+    hex: '#64748b'
+  }
+];
+
+export const ALL_CATEGORIES = [...DEFAULT_CATEGORIES, ...INCOME_CATEGORIES];
+
+export const getCategoriesByType = (type) =>
+  type === 'income' ? INCOME_CATEGORIES : DEFAULT_CATEGORIES;
+
+export const getCategory = (categoryId) =>
+  ALL_CATEGORIES.find(c => c.id === categoryId) ||
+  DEFAULT_CATEGORIES[DEFAULT_CATEGORIES.length - 1];
+
 export const INITIAL_DEMO_TRANSACTIONS = [
   {
     id: 'demo-1',
@@ -134,7 +210,7 @@ export const INITIAL_DEMO_TRANSACTIONS = [
     id: 'demo-8',
     amount: 1800.00,
     type: 'income',
-    categoryId: 'other',
+    categoryId: 'salary',
     note: 'Основна заробітна плата',
     date: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),
   }

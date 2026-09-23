@@ -1,5 +1,5 @@
 import { formatDate } from './formatters';
-import { DEFAULT_CATEGORIES } from './constants';
+import { ALL_CATEGORIES } from './constants';
 import { fromBase } from './currency';
 
 const escapeCell = (value) => {
@@ -18,7 +18,7 @@ export const exportTransactionsToCSV = (transactions, monthString, currency = 'U
   const headers = ['ID', 'Дата', 'Тип', 'Категорія', 'Сума', 'Валюта', 'Примітка'];
 
   const rows = transactions.map(t => {
-    const cat = DEFAULT_CATEGORIES.find(c => c.id === t.categoryId);
+    const cat = ALL_CATEGORIES.find(c => c.id === t.categoryId);
     const catName = cat ? cat.name : t.categoryId;
     const typeLabel = t.type === 'income' ? 'Дохід' : 'Витрата';
 

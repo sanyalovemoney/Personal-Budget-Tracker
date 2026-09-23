@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useBudget } from '../../context/BudgetContext';
-import { DEFAULT_CATEGORIES } from '../../utils/constants';
+import { getCategoriesByType } from '../../utils/constants';
 import { MAX_AMOUNT, isValidAmount } from '../../utils/currency';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
-import { PlusCircle, Save, DollarSign, Calendar, FileText, Tag, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { Save, Calendar, FileText, Tag, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
 import * as Icons from 'lucide-react';
 
 export const ExpenseForm = ({ isOpen, onClose, initialData = null }) => {
@@ -16,18 +16,28 @@ export const ExpenseForm = ({ isOpen, onClose, initialData = null }) => {
   const [date, setDate] = useState(new Date().toISOString().substring(0, 10));
   const [note, setNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const categories = getCategoriesByType(type);
+
+  const switchType = (nextType) => {
+    setType(nextType);
+    const nextCategories = getCategoriesByType(nextType);
+    if (!nextCategories.some(category => category.id === categoryId)) {
+      setCategoryId(nextCategories[0].id);
+    }
+  };
 
   useEffect(() => {
     if (initialData) {
       setAmount(initialData.amount != null ? toDisplayAmount(initialData.amount) : '');
-      setType(initialData.type || 'expense');
-      setCategoryId(initialData.categoryId || 'food');
+      const initialType = initialData.type || 'expense';
+      setType(initialType);
+      setCategoryId(initialData.categoryId || getCategoriesByType(initialType)[0].id);
       setDate(initialData.date ? initialData.date.substring(0, 10) : new Date().toISOString().substring(0, 10));
       setNote(initialData.note || '');
     } else {
       setAmount('');
       setType('expense');
-      setCategoryId('food');
+      setCategoryId(getCategoriesByType('expense')[0].id);
       setDate(new Date().toISOString().substring(0, 10));
       setNote('');
     }
@@ -76,7 +86,7 @@ export const ExpenseForm = ({ isOpen, onClose, initialData = null }) => {
         <div className="grid grid-cols-2 gap-2 p-1.5 bg-slate-100 dark:bg-slate-800 rounded-2xl">
           <button
             type="button"
-            onClick={() => setType('expense')}
+            onClick={() => switchType('expense')}
             className={`flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm transition-all ${
               type === 'expense'
                 ? 'bg-rose-500 text-white shadow-md shadow-rose-500/25'
@@ -88,7 +98,7 @@ export const ExpenseForm = ({ isOpen, onClose, initialData = null }) => {
           </button>
           <button
             type="button"
-            onClick={() => setType('income')}
+            onClick={() => switchType('income')}
             className={`flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold text-sm transition-all ${
               type === 'income'
                 ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/25'
@@ -125,10 +135,10 @@ export const ExpenseForm = ({ isOpen, onClose, initialData = null }) => {
         {/* Category Selector Tags */}
         <div>
           <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">
-            Категорія (Тег)
+            {type === 'income' ? 'Джерело доходу' : 'Категорія витрат'}
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-h-40 overflow-y-auto p-1">
-            {DEFAULT_CATEGORIES.map((cat) => {
+            {categories.map((cat) => {
               const IconComp = Icons[cat.icon] || Tag;
               const isSelected = categoryId === cat.id;
 

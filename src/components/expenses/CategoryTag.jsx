@@ -1,9 +1,9 @@
 import React from 'react';
-import { DEFAULT_CATEGORIES } from '../../utils/constants';
+import { getCategory } from '../../utils/constants';
 import * as Icons from 'lucide-react';
 
 export const CategoryTag = ({ categoryId, className = '' }) => {
-  const category = DEFAULT_CATEGORIES.find(c => c.id === categoryId) || DEFAULT_CATEGORIES[DEFAULT_CATEGORIES.length - 1];
+  const category = getCategory(categoryId);
   const IconComponent = Icons[category.icon] || Icons.Tag;
 
   return (

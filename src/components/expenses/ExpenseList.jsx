@@ -4,8 +4,8 @@ import { ExpenseItem } from './ExpenseItem';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { exportTransactionsToCSV } from '../../utils/exportUtils';
-import { DEFAULT_CATEGORIES } from '../../utils/constants';
-import { Search, Download, Plus, Filter, Receipt } from 'lucide-react';
+import { DEFAULT_CATEGORIES, INCOME_CATEGORIES, getCategory } from '../../utils/constants';
+import { Search, Download, Plus, Receipt } from 'lucide-react';
 
 export const ExpenseList = ({ onOpenAddModal, onEditTransaction }) => {
   const { monthlyTransactions, selectedMonth, currency } = useBudget();
@@ -22,8 +22,7 @@ export const ExpenseList = ({ onOpenAddModal, onEditTransaction }) => {
 
     // Search term filter
     if (searchTerm.trim()) {
-      const cat = DEFAULT_CATEGORIES.find(c => c.id === t.categoryId);
-      const catName = cat ? cat.name.toLowerCase() : '';
+      const catName = getCategory(t.categoryId).name.toLowerCase();
       const note = (t.note || '').toLowerCase();
       const term = searchTerm.toLowerCase();
       return note.includes(term) || catName.includes(term);
@@ -89,9 +88,16 @@ export const ExpenseList = ({ onOpenAddModal, onEditTransaction }) => {
           className="px-3 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-900 dark:text-white cursor-pointer"
         >
           <option value="all">Усі категорії</option>
-          {DEFAULT_CATEGORIES.map(c => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
+          <optgroup label="Витрати">
+            {DEFAULT_CATEGORIES.map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </optgroup>
+          <optgroup label="Доходи">
+            {INCOME_CATEGORIES.map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </optgroup>
         </select>
 
       </div>
